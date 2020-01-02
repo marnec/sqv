@@ -17,7 +17,15 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "sqv-lib": [
+        "dist/sqv-lib"
+      ],
+      "sqv-lib/*": [
+        "dist/sqv-lib/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
