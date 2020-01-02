@@ -29,6 +29,7 @@ export class ColorsModel {
   process(inp: Colors) {
 
     this.transformInput(inp);
+    this.transformColors();
   }
 
 
@@ -97,25 +98,51 @@ export class ColorsModel {
 
     let arrColors;
     let n;
+    let c;
+    let t;
     for (const type in this.palette) {
       if (type === 'adjacent' || type === 'opposite') {
 
         // tslint:disable-next-line:forin
-        for (const row in this.palette.coloring) {
-          n = type[row].indexes.length + type[row].chars.length;
+        for (const row in this.palette[type]) {
+          c = this.palette[type][row];
+          n = c.indexes.length + c.chars.length;
           type === 'adjacent' ? arrColors = this.adjacent(n) : arrColors = this.opposite(n);
-          type[row].indexes.sort((a, b) => (a.start > b.start) ? 1 : -1);
+          c.indexes.sort((a, b) => (a.start > b.start) ? 1 : -1);
 
-          for (const e of type[row].indexes) {
+          for (const e of c.indexes) {
             e.color = arrColors.pop();
           }
 
-          for (const e of type[row].chars) {
+          for (const e of c.chars) {
             e.color = arrColors.pop();
           }
         }
 
       } else if (type === 'custom') {
+
+        // tslint:disable-next-line:forin
+        for (const row in this.palette[type]) {
+          c = this.palette[type][row];
+
+          // tslint:disable-next-line:forin
+          for (const e in c.indexes) {
+            t = c.indexes[e];
+            t.color = this.checkColor(t.color);
+            if (t.color === -1) {
+              delete c.indexes[e];
+            }
+          }
+
+          // tslint:disable-next-line:forin
+          for (const e in c.chars) {
+            t = c.chars[e];
+            t.color = this.checkColor(t.color);
+            if (t.color === -1) {
+              delete c.chars[e];
+            }
+          }
+        }
 
       } else {
         Log.w(1, 'Unknown coloring type.');
@@ -161,6 +188,84 @@ export class ColorsModel {
     return result;
   }
 
+  private checkColor(color: string) {
+
+    if (color[0] === '(') {
+      return this.checkRgb(color);
+    } else if (color[0] === '#') {
+      return this.checkHex(color);
+    } else {
+      Log.w(1, 'invalid color format');
+      return -1;
+    }
+  }
+
+  private checkHex(color: string) {
+
+    const c = {
+      0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, a: 10,
+      b: 11, c: 12, d: 13, e: 14, f: 15, A: 10, B: 11, C: 12, D: 13, E: 14, F: 15
+    };
+    let l1;
+    let l2;
+    let rgb = '(';
+    const hex = color.replace('#', '');
+
+    if (hex.length !== 6) {
+      Log.w(1, 'invalid hex format.');
+      return -1;
+    }
+
+    for (let i = 0; i < 3; i++) {
+      l1 = c[hex[i * 2]];
+      l2 = c[hex[i * 2 + 1]];
+
+      if (!l1 || !l2) {
+        Log.w(1, 'Invalid char in hex value.');
+        return -1;
+      }
+
+      rgb += (l1 * 16 + l2).toString() + ', ';
+    }
+    return rgb.substr(0, rgb.length - 2).concat(')');
+  }
+
+  private checkRgb(color: string) {
+
+    let tmp;
+    const rgb = color.replace('(', '')
+      .replace(')', '')
+      .split(',');
+
+    if (rgb.length > 2) {
+
+      for (let i = 0; i < 3; i++) {
+        tmp = +rgb[i];
+        if (isNaN(tmp) || tmp < 0 || tmp > 255) {
+          Log.w(1, 'wrong value for rgb.');
+          return -1;
+        }
+      }
+
+    }
+
+    if (rgb.length > 3) {
+      tmp = +rgb[3];
+      if (isNaN(tmp) || tmp < 0 || tmp > 1) {
+        Log.w(1, 'wrong opacity value for rgb.');
+        return -1;
+      }
+    }
+
+    if (rgb.length <= 2 || rgb.length > 4) {
+      Log.w(1, 'invalid format for rgb.');
+      return -1;
+    }
+
+    return rgb;
+
+  }
+
   private opposite(n: number) {
     const result = [];
     const mid = Math.floor(n / 2);
@@ -200,7 +305,6 @@ export class ColorsModel {
       while (remainder > 0) {
         if (add) {
           tmp = (((value + 1) % 3) + 3) % 3;
-          console.log([add, value, tmp]);
           if (rgb[tmp] + remainder > 255) {
             remainder -= (255 - rgb[tmp]);
             rgb[tmp] = 255;
@@ -212,7 +316,6 @@ export class ColorsModel {
           }
         } else {
           tmp = (((value - 1) % 3) + 3) % 3;
-          console.log([add, value, tmp]);
           if (rgb[tmp] - remainder < 0) {
             remainder -= rgb[tmp];
             rgb[tmp] = 0;
@@ -225,7 +328,6 @@ export class ColorsModel {
       }
       colors.push('(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')');
     }
-
     return colors;
   }
 }

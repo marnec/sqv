@@ -15,15 +15,15 @@ export class AppComponent {
     },
     colors: {
       '1-3': [
-        { row: '2', color: '#333', target: 'background'},
+        { row: '2', color: '#a1b2c3', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
         ],
       15: [
-        { row: '2', color: '#333', target: 'background'},
+        { row: '2', color: '#aadd44', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
       ],
       ATG: [
-        { row: '2', color: '#333', target: 'background'},
+        { row: '2', color: '#bb55cc', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
       ]
     },
