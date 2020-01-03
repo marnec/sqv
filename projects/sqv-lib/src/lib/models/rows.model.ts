@@ -1,12 +1,12 @@
 import {Log} from './log.model';
 import {FiltersModel} from './filters.model';
-import {ColorsModel} from './colors.model';
 
-interface Rows {
-  [key: number]: Row;
+/** Input Rows */
+interface InpRows {
+  [rowNum: number]: InpRow;
 }
 
-interface Row {
+interface InpRow {
   data: (string | Array<string> | Dict);
   filter?: string;
 }
@@ -15,16 +15,32 @@ interface Dict {
   [key: string]: string;
 }
 
+/** Output Rows */
+interface OutRows {
+  [rowNum: number]: OutRow;
+}
+
+interface OutRow {
+  [idx: number]: {char: string, color?: string, target?: string};
+}
+
 export class RowsModel {
 
-  rows: Rows;
+  rows: OutRows;
 
   constructor() {
-    this.rows = { 1: {data: ''}};
+    this.rows = {};
   }
 
-  process(rows: Rows) {
-    // console.log(rows);
+  process(rows: InpRows) {
+
+    // keep previous data
+    if (!rows) {
+      return;
+    }
+
+    // reset data
+    this.rows = {};
 
     let data;
     let filter;
@@ -72,9 +88,21 @@ export class RowsModel {
         data = FiltersModel.process(data, filter);
       }
 
-
+      this.rows[row] = {};
+      // tslint:disable-next-line:forin
+      for (const idx in data) {
+        this.rows[row][idx] = {char: data[idx]};
+      }
     }
-    console.log(rows);
+    console.log(this.rows);
 
+  }
+
+  getRowsList() {
+    return Object.keys(this.rows);
+  }
+
+  getRow(rowNum: number) {
+    return this.rows[rowNum];
   }
 }

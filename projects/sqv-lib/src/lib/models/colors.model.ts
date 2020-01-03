@@ -1,63 +1,113 @@
 import {Log} from './log.model';
 
-interface Colors {
-  [key: string]: Array<Color>;
+/** Input Colors */
+interface InpColors {
+  [key: string]: Array<InpColor>;
 }
 
-interface Color {
+interface InpColor {
   row: string;
   color: string;
   target?: string;
 }
 
-interface TransColor {
-  [row: string]: { indexes: Array<EntityColor>, chars: Array<EntityColor> };
+/** Output Colors */
+// E.g.: 'coloring': {rowNum: { positions:[{start, end, color, target}] , chars: [{entity, color, target}]}}
+interface OutColors {
+  [coloring: string]: OutColor;
 }
 
-interface EntityColor {
-  entity?: string;
-  start?: number;
-  end?: number;
+interface OutColor {
+  [rowNum: string]: {positions: Array<PositionColor>, chars: Array<CharColor>};
+}
+
+interface PositionColor {
+  start: number;
+  end: number;
+  color?: string;
+  target: string;
+}
+
+interface CharColor {
+  entity: string;
   color?: string;
   target: string;
 }
 
 export class ColorsModel {
-  // E.g.: 'coloring': {rowNum: { indexes:[{start, end, color, target}] , chars: [{entity, color, target}]}}
-  palette: {[key: string]: TransColor};
 
-  process(inp: Colors) {
+  palette: OutColors;
 
-    this.transformInput(inp);
-    this.transformColors();
+  getRowsList(coloring: string) {
+    const outCol = this.palette[coloring];
+    if (!outCol) {
+      return [];
+    }
+    return Object.keys(outCol);
   }
 
+  getPositions(coloring: string, rowNum: number) {
+    let outCol: any;
+    outCol = this.palette[coloring];
+    if (!outCol) {
+      return [];
+    }
+    outCol = outCol[rowNum];
+    if (!outCol) {
+      return [];
+    }
+    outCol = outCol.positions;
+    if (!outCol) {
+      return [];
+    }
+    return Object.keys(outCol);
+  }
 
+  getChars(coloring: string, rowNum: number) {
+    let outCol: any;
+    outCol = this.palette[coloring];
+    if (!outCol) {
+      return [];
+    }
+    outCol = outCol[rowNum];
+    if (!outCol) {
+      return [];
+    }
+    outCol = outCol.chars;
+    if (!outCol) {
+      return [];
+    }
+    return Object.keys(outCol);
+  }
 
-  private transformInput(inp: Colors) {
+  process(inp: InpColors, sep: string) {
+
+    this.transformInput(inp, sep);
+    this.transformColors();
+    console.log(this.palette);
+  }
+
+  private transformInput(inp: InpColors, sep: string) {
+
+    // if don't receive new colors, keep old colors
+    if (!inp) {
+      return;
+    }
+
+    // if receive new colors, change them
     this.palette = {};
+
     let info;
     let regions;
     // transform input structure
     // tslint:disable-next-line:forin
     for (const reg in inp) {
 
-      // if region is a single number: e.g: '1'
-      if (!isNaN(+reg)) {
+      // if first element in region is a number: e.g. '1-2'
+      if (reg.indexOf(sep) > -1) {
 
-        for (const e of inp[reg]) {
-          info = this.processColor(e);
-          if (info === -1) {
-            continue;
-          }
-          this.palette[info.type][info.row].indexes.push({start: +reg, end: +reg, color: e.color, target: info.target});
-        }
-
-        // if first element in region is a number: e.g. '1-2'
-      } else if (!isNaN(+reg[0])) {
-
-        regions = reg.split('-');
-        if (regions.length < 2) {
+        regions = reg.split(sep);
+        if (regions.length !== 2) {
           Log.w(1, 'wrong region format.');
           continue;
         }
@@ -77,9 +127,10 @@ export class ColorsModel {
           if (info === -1) {
             continue;
           }
-          this.palette[info.type][info.row].indexes.push({start: regions[0], end: regions[1], color: e.color, target: info.target});
+
+          this.palette[info.type][info.row].positions.push({start: regions[0], end: regions[1], color: e.color, target: info.target});
         }
-        // if region contains letters: e.g. 'A' || 'ATG'
+        // if region contains chars: e.g. 'A' || 'ATG' || '1'
       } else {
 
         for (const e of inp[reg]) {
@@ -106,11 +157,11 @@ export class ColorsModel {
         // tslint:disable-next-line:forin
         for (const row in this.palette[type]) {
           c = this.palette[type][row];
-          n = c.indexes.length + c.chars.length;
+          n = c.positions.length + c.chars.length;
           type === 'adjacent' ? arrColors = this.adjacent(n) : arrColors = this.opposite(n);
-          c.indexes.sort((a, b) => (a.start > b.start) ? 1 : -1);
+          c.positions.sort((a, b) => (a.start > b.start) ? 1 : -1);
 
-          for (const e of c.indexes) {
+          for (const e of c.positions) {
             e.color = arrColors.pop();
           }
 
@@ -126,11 +177,11 @@ export class ColorsModel {
           c = this.palette[type][row];
 
           // tslint:disable-next-line:forin
-          for (const e in c.indexes) {
-            t = c.indexes[e];
+          for (const e in c.positions) {
+            t = c.positions[e];
             t.color = this.checkColor(t.color);
             if (t.color === -1) {
-              delete c.indexes[e];
+              delete c.positions[e];
             }
           }
 
@@ -150,7 +201,7 @@ export class ColorsModel {
     }
   }
 
-  private processColor(e: Color) {
+  private processColor(e: InpColor) {
 
     const result = {type: 'custom', row: -1, target: 'background'};
 
@@ -183,7 +234,7 @@ export class ColorsModel {
     }
     // if row not inserted yet
     if (!(result.row in this.palette[result.type])) {
-      this.palette[result.type][result.row] = {indexes: [], chars: []};
+      this.palette[result.type][result.row] = {positions: [], chars: []};
     }
     return result;
   }
@@ -193,7 +244,11 @@ export class ColorsModel {
     if (color[0] === '(') {
       return this.checkRgb(color);
     } else if (color[0] === '#') {
-      return this.checkHex(color);
+      const rgb = this.checkHex(color);
+      if (rgb !== -1) {
+        return this.checkRgb(rgb);
+      }
+      return -1;
     } else {
       Log.w(1, 'invalid color format');
       return -1;
@@ -233,6 +288,8 @@ export class ColorsModel {
   private checkRgb(color: string) {
 
     let tmp;
+    let prefix;
+    let result;
     const rgb = color.replace('(', '')
       .replace(')', '')
       .split(',');
@@ -246,7 +303,7 @@ export class ColorsModel {
           return -1;
         }
       }
-
+      prefix = 'rgb';
     }
 
     if (rgb.length > 3) {
@@ -255,6 +312,10 @@ export class ColorsModel {
         Log.w(1, 'wrong opacity value for rgb.');
         return -1;
       }
+      prefix = 'rgba';
+      result = '(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', ' + rgb[3] + ')';
+    } else {
+      result = '(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ')';
     }
 
     if (rgb.length <= 2 || rgb.length > 4) {
@@ -262,7 +323,7 @@ export class ColorsModel {
       return -1;
     }
 
-    return rgb;
+    return prefix + result;
 
   }
 
@@ -326,7 +387,7 @@ export class ColorsModel {
           }
         }
       }
-      colors.push('(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')');
+      colors.push('rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ', 0.4)');
     }
     return colors;
   }

@@ -19,7 +19,7 @@ export class AppComponent {
         { row: '3', color: '@adjacent', target: 'border'},
         ],
       15: [
-        { row: '2', color: '#aadd44', target: 'background'},
+        { row: '2', color: '(22, 33, 4, 0.3)', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
       ],
       ATG: [

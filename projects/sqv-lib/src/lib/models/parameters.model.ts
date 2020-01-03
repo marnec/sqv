@@ -5,6 +5,7 @@ interface Parameter {
   chunkSize?: number;
   spaceSize?: number;
   log?: string;
+  separator?: string;
 }
 
 export class ParametersModel {
@@ -13,7 +14,8 @@ export class ParametersModel {
     fontSize: '14px',
     chunkSize: 0,
     spaceSize: 1,
-    log: 'none'
+    log: 'none',
+    separator: '-'
   };
 
   process(inp: Parameter) {
@@ -90,5 +92,27 @@ export class ParametersModel {
     } else {
       Log.w(2, 'log not set.');
     }
+
+    /** check separator value */
+    if (inp.separator) {
+      if (typeof inp.separator !== 'string') {
+        Log.w(1, 'wrong separator type.');
+      } else {
+        this.params.separator = inp.separator;
+      }
+    }
+  }
+
+  getFontSize() {
+    return this.params.fontSize;
+  }
+  getChunkSize() {
+    return this.params.chunkSize;
+  }
+  getSpaceSize() {
+    return this.params.spaceSize;
+  }
+  getSeparator() {
+    return this.params.separator;
   }
 }
