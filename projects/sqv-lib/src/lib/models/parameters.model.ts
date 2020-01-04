@@ -6,6 +6,7 @@ interface Parameter {
   spaceSize?: number;
   log?: string;
   separator?: string;
+  emptyFiller?: string;
 }
 
 export class ParametersModel {
@@ -15,7 +16,8 @@ export class ParametersModel {
     chunkSize: 0,
     spaceSize: 1,
     log: 'none',
-    separator: '-'
+    separator: '-',
+    emptyFiller: ' '
   };
 
   process(inp: Parameter) {
@@ -101,6 +103,15 @@ export class ParametersModel {
         this.params.separator = inp.separator;
       }
     }
+
+    /** check emptyFiller value */
+    if (inp.emptyFiller) {
+      if (typeof inp.emptyFiller !== 'string') {
+        Log.w(1, 'wrong emptyFiller type.');
+      } else {
+        this.params.emptyFiller = inp.emptyFiller;
+      }
+    }
   }
 
   getFontSize() {
@@ -114,5 +125,8 @@ export class ParametersModel {
   }
   getSeparator() {
     return this.params.separator;
+  }
+  getEmptyFiller() {
+    return this.params.emptyFiller;
   }
 }

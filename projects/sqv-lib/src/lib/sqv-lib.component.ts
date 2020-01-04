@@ -3,10 +3,12 @@ import { ParametersModel } from './models/parameters.model';
 import {RowsModel} from './models/rows.model';
 import {ColorsModel} from './models/colors.model';
 import {Log} from './models/log.model';
+import {SafeHtml} from '@angular/platform-browser';
 
 @Component ({
   selector: 'mb-sqv-lib',
-  template: 'prova: {{sqvBody}}'
+  template: '<div class="sqv-body" [innerHTML]="sqvBody"></div>',
+  styleUrls: ['sqv-lib.component.scss']
 })
 
 export class SqvLibComponent implements OnChanges {
@@ -14,7 +16,7 @@ export class SqvLibComponent implements OnChanges {
   params: ParametersModel;
   rows: RowsModel;
   colors: ColorsModel;
-  sqvBody;
+  sqvBody: SafeHtml;
   data;
 
   constructor() {
@@ -42,6 +44,9 @@ export class SqvLibComponent implements OnChanges {
 
     /** apply color to data rows */
     this.processRowsCols();
+
+    /** create/update sqv-body html */
+    this.createGUI();
   }
 
   processRowsCols() {
@@ -170,6 +175,59 @@ export class SqvLibComponent implements OnChanges {
       }
     }
     return result;
+  }
+
+  private createGUI() {
+
+    const chunkSize = this.params.getChunkSize();
+    const emptyFiller = this.params.getEmptyFiller();
+
+    // max index among data rows
+    let maxIdx = 0;
+    let actualIdx;
+    for (const row of this.data) {
+      actualIdx = Math.max(...Object.keys(row).map(Number));
+      if (maxIdx < actualIdx) {
+        maxIdx = actualIdx;
+      }
+    }
+
+    this.sqvBody = '';
+    let chunk;
+    let cards = '';
+    let cells = '';
+    let cell;
+    let entity;
+    let style;
+    for (let i = 0; i < maxIdx; i++) {
+
+      for (const row of this.data) {
+        entity = row[i];
+        if (!entity) {
+          cell = `<div class="cell">${emptyFiller}</div>`;
+        } else {
+          style = '';
+          if (entity.target && entity.color) {
+            style = `${entity.target} ${entity.color};`;
+          }
+          cell = `<div class="cell" style="${style}">${entity.char}</div>`;
+        }
+        cells += cell;
+      }
+
+      cards += `<div class="card">${cells}</div>`;
+      cells = '';
+
+      if (chunkSize > 0 && i > 0 && i % chunkSize === 0) {
+        chunk = `<div class="chunk">${cards}</div>`;
+        cards = '';
+        this.sqvBody += chunk;
+      }
+
+      // ricordati che maxIdx non è solitamente multiplo di chunksize!
+
+      // check body height and show index if needed
+    }
   }
 
 }
