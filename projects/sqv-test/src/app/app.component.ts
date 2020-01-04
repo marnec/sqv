@@ -11,7 +11,7 @@ export class AppComponent {
     rows: {
       1: {data: ['1', '2', '3', '4', '5', '6'], filter: 'skipIndex_2'},
       2: {data: 'BABABABBABABABBA', filter: 'skipIndex_2'},
-      3: {data: {5: 'a', 2: 'r'}, filter: 'skipIndex_2'}
+      3: {data: {5: 'a', 2: 'r', 1: '15'}, filter: 'skipIndex_2'}
     },
     colors: {
       '1-3': [
@@ -22,7 +22,7 @@ export class AppComponent {
         { row: '2', color: '(22, 33, 4, 0.3)', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
       ],
-      ATG: [
+      BA: [
         { row: '2', color: '#bb55cc', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
       ]

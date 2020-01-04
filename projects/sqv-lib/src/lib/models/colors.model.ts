@@ -60,7 +60,7 @@ export class ColorsModel {
     if (!outCol) {
       return [];
     }
-    return Object.keys(outCol);
+    return outCol;
   }
 
   getChars(coloring: string, rowNum: number) {
@@ -77,7 +77,7 @@ export class ColorsModel {
     if (!outCol) {
       return [];
     }
-    return Object.keys(outCol);
+    return outCol;
   }
 
   process(inp: InpColors, sep: string) {
@@ -128,7 +128,8 @@ export class ColorsModel {
             continue;
           }
 
-          this.palette[info.type][info.row].positions.push({start: regions[0], end: regions[1], color: e.color, target: info.target});
+          this.palette[info.type][info.row].positions
+            .push({start: regions[0] - 1, end: regions[1] - 1, color: e.color, target: info.target});
         }
         // if region contains chars: e.g. 'A' || 'ATG' || '1'
       } else {
