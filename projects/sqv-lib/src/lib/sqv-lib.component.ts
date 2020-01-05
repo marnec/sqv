@@ -24,7 +24,6 @@ export class SqvLibComponent implements OnChanges {
     this.rows = new RowsModel();
     this.colors = new ColorsModel();
     this.data = [];
-
   }
 
   ngOnChanges() {
@@ -179,18 +178,46 @@ export class SqvLibComponent implements OnChanges {
 
   private createGUI() {
 
+    const sqvBody = document.getElementsByClassName('sqv-body');
+    if (!sqvBody) {
+      Log.w(1, 'Cannot find sqv-body element.');
+      return;
+    }
+
     const chunkSize = this.params.getChunkSize();
     const emptyFiller = this.params.getEmptyFiller();
+    const fontSize = this.params.getFontSize();
+    const spaceSize = this.params.getSpaceSize();
+    const percent = 0.15;
+    const adjust = 3 / 5;
 
-    // max index among data rows
+    // max index and number of chars among data rows
     let maxIdx = 0;
-    let actualIdx;
+    let maxChars = 1;
+    const rowFont = [];
+    let actualChar;
     for (const row of this.data) {
-      actualIdx = Math.max(...Object.keys(row).map(Number));
-      if (maxIdx < actualIdx) {
-        maxIdx = actualIdx;
+      actualChar = 0;
+      // tslint:disable-next-line:forin
+      for (const idx in row) {
+
+        if (maxIdx < +idx) {
+          maxIdx = +idx;
+        }
+        if (maxChars < row[idx].char.length) {
+          maxChars = row[idx].char.length;
+        }
+        if (actualChar < row[idx].char.length) {
+          actualChar = row[idx].char.length;
+        }
       }
+      rowFont.push(1 - (percent * (actualChar - 1)));
     }
+
+    if (chunkSize > 0) {
+      maxIdx += chunkSize - (maxIdx % chunkSize);
+    }
+    maxChars = adjust * (maxChars * (1 - percent * (maxChars - 1)));
 
     this.sqvBody = '';
     let chunk;
@@ -200,31 +227,37 @@ export class SqvLibComponent implements OnChanges {
     let entity;
     let style;
     for (let i = 1; i <= maxIdx; i++) {
-
-      for (const row of this.data) {
-        entity = row[i - 1];
+      for (let j = 0; j < this.data.length; j++) {
+        entity = this.data[j][i];
+        style = 'font-size: ' + rowFont[j] + 'em;';
         if (!entity) {
-          cell = `<div class="cell">${emptyFiller}</div>`;
+          cell = `<div class="cell" style="${style}">${emptyFiller}</div>`;
         } else {
-          style = '';
           if (entity.target && entity.color) {
-            style = `${entity.target} ${entity.color};`;
+            style += `${entity.target} ${entity.color};`;
           }
           cell = `<div class="cell" style="${style}">${entity.char}</div>`;
         }
         cells += cell;
       }
 
-      cards += `<div class="card">${cells}</div>`;
+      style = `width: ${maxChars}em;`;
+      cards += `<div class="card" style="${style}">${cells}</div>`;
       cells = '';
 
       if (chunkSize > 0 && i % chunkSize === 0) {
-        chunk = `<div class="chunk">${cards}</div>`;
+        style = `font-size: ${fontSize};`;
+        if (i !== maxIdx) {
+          style += 'padding-right: ' + spaceSize + 'em;';
+        } else {
+          style += 'margin-right: ' + spaceSize + 'em;';
+        }
+        chunk = `<div class="chunk" style="${style}">${cards}</div>`;
         cards = '';
         this.sqvBody += chunk;
-      }
 
-      // ricordati che maxIdx non è solitamente multiplo di chunksize!
+        console.log(sqvBody[0].clientHeight);
+      }
 
       // check body height and show index if needed
     }

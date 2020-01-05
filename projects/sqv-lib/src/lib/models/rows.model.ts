@@ -61,12 +61,12 @@ export class RowsModel {
       if (typeof data === 'string') {
         const tmp = {};
         for (let i = 0; i < data.length; i++) {
-          tmp[i] = data[i];
+          tmp[i + 1] = data[i];
         }
         data = tmp;
       } else if (data instanceof Array) {
         const tmp = {};
-        data.forEach((c, i) => tmp[i] = c);
+        data.forEach((c, i) => tmp[i + 1] = c);
         data = tmp;
       } else if (typeof data === 'object') {
         /** check data keys */

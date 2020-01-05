@@ -12,9 +12,9 @@ interface Parameter {
 export class ParametersModel {
 
   params: Parameter =  {
-    fontSize: '14px',
+    fontSize: '18px',
     chunkSize: 0,
-    spaceSize: 1,
+    spaceSize: 1, // relative to fontSize
     log: 'none',
     separator: '-',
     emptyFiller: '&nbsp;'

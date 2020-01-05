@@ -10,8 +10,8 @@ export class AppComponent {
   input: any = {
     rows: {
       1: {data: ['1', '2', '3', '4', '5', '6'], filter: 'skipIndex_2'},
-      2: {data: 'BABABABBABABABBA', filter: 'skipIndex_2'},
-      3: {data: {5: 'a', 2: 'r', 1: '15'}, filter: 'skipIndex_2'}
+      2: {data: 'BABABABBABABABBAanansjdnaj123123najeadajandajndj12jn231jas', filter: 'skipIndex_2'},
+      3: {data: {5: '2', 8: '1', 1: '1'}, filter: 'skipIndex_2'}
     },
     colors: {
       '1-3': [
@@ -23,12 +23,12 @@ export class AppComponent {
         { row: '3', color: '@adjacent', target: 'border'},
       ],
       BA: [
-        { row: '2', color: '#bb55cc', target: 'background'},
+        { row: '2', color: '#bb55cc', target: 'foreground'},
         { row: '3', color: '@adjacent', target: 'border'},
       ]
     },
     parameters: {
-      fontSize: '14px',
+      fontSize: '25px',
       chunkSize: '10',
       spaceSize: '1',
       log: 'debug'
