@@ -17,7 +17,7 @@ export class ParametersModel {
     spaceSize: 1,
     log: 'none',
     separator: '-',
-    emptyFiller: ' '
+    emptyFiller: '&nbsp;'
   };
 
   process(inp: Parameter) {
@@ -112,6 +112,7 @@ export class ParametersModel {
         this.params.emptyFiller = inp.emptyFiller;
       }
     }
+
   }
 
   getFontSize() {

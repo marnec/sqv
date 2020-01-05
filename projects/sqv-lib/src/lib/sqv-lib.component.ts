@@ -7,8 +7,8 @@ import {SafeHtml} from '@angular/platform-browser';
 
 @Component ({
   selector: 'mb-sqv-lib',
-  template: '<div class="sqv-body" [innerHTML]="sqvBody"></div>',
-  styleUrls: ['sqv-lib.component.scss']
+  template: '<div class="sqv-body" [innerHTML]="sqvBody | safe : \'html\' "></div>',
+  styleUrls: ['./sqv-lib.component.css']
 })
 
 export class SqvLibComponent implements OnChanges {
@@ -199,10 +199,10 @@ export class SqvLibComponent implements OnChanges {
     let cell;
     let entity;
     let style;
-    for (let i = 0; i < maxIdx; i++) {
+    for (let i = 1; i <= maxIdx; i++) {
 
       for (const row of this.data) {
-        entity = row[i];
+        entity = row[i - 1];
         if (!entity) {
           cell = `<div class="cell">${emptyFiller}</div>`;
         } else {
@@ -218,7 +218,7 @@ export class SqvLibComponent implements OnChanges {
       cards += `<div class="card">${cells}</div>`;
       cells = '';
 
-      if (chunkSize > 0 && i > 0 && i % chunkSize === 0) {
+      if (chunkSize > 0 && i % chunkSize === 0) {
         chunk = `<div class="chunk">${cards}</div>`;
         cards = '';
         this.sqvBody += chunk;

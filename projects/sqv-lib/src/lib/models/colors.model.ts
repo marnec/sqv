@@ -204,7 +204,7 @@ export class ColorsModel {
 
   private processColor(e: InpColor) {
 
-    const result = {type: 'custom', row: -1, target: 'background-color'};
+    const result = {type: 'custom', row: -1, target: 'background-color:'};
 
     // check if row key is a number
     if (e.row === undefined || isNaN(+e.row)) {
@@ -226,8 +226,8 @@ export class ColorsModel {
         result.target = 'background-color:';
       } else if (e.target === 'foreground') {
         result.target = 'color:';
-      } else if (e.target === 'border: 1px solid') {
-        result.target = e.target;
+      } else if (e.target === 'border') {
+        result.target = 'border: 1px solid';
       }
     }
 
