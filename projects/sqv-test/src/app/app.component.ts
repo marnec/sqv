@@ -29,7 +29,7 @@ export class AppComponent {
     },
     parameters: {
       fontSize: '25px',
-      chunkSize: '10',
+      chunkSize: '5',
       spaceSize: '1',
       log: 'debug'
     }
