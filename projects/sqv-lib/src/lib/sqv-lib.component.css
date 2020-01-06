@@ -24,6 +24,26 @@
   clear: both;
 }
 
+:host ::ng-deep .index {
+  position: relative;
+  float: left;
+  width: 2em;
+  background-color: #dddddd;
+  padding: 0.1em;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .hidden {
+  display: none;
+}
+
+:host ::ng-deep .absolute {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  font-size: 0.6em;
+}
+
 :host ::ng-deep .card {
   position: relative;
   float: left;

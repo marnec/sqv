@@ -3,11 +3,10 @@ import { ParametersModel } from './models/parameters.model';
 import {RowsModel} from './models/rows.model';
 import {ColorsModel} from './models/colors.model';
 import {Log} from './models/log.model';
-import {SafeHtml} from '@angular/platform-browser';
 
 @Component ({
   selector: 'mb-sqv-lib',
-  template: '<div class="sqv-body" [innerHTML]="sqvBody | safe : \'html\' "></div>',
+  template: '<div class="sqv-body"></div>',
   styleUrls: ['./sqv-lib.component.css']
 })
 
@@ -16,7 +15,6 @@ export class SqvLibComponent implements OnChanges {
   params: ParametersModel;
   rows: RowsModel;
   colors: ColorsModel;
-  sqvBody: SafeHtml;
   data;
 
   constructor() {
@@ -24,6 +22,28 @@ export class SqvLibComponent implements OnChanges {
     this.rows = new RowsModel();
     this.colors = new ColorsModel();
     this.data = [];
+
+    window.onresize = () => {
+
+      const chunks = document.getElementsByClassName('chunk');
+      if (!chunks) {
+        Log.w(1, 'Cannot find chunk elements.');
+        return;
+      }
+
+      let oldTop = 0;
+      let newTop;
+      // tslint:disable-next-line:prefer-for-of
+      for (let i = 0; i < chunks.length; i++) {
+        newTop = chunks[i].getBoundingClientRect().top;
+        if (newTop > oldTop) {
+          chunks[i].firstElementChild.className = 'index';
+          oldTop = newTop;
+        } else {
+          chunks[i].firstElementChild.className = 'index hidden';
+        }
+      }
+    };
   }
 
   ngOnChanges() {
@@ -194,6 +214,7 @@ export class SqvLibComponent implements OnChanges {
     // max index and number of chars among data rows
     let maxIdx = 0;
     let maxChars = 1;
+    let chunkHeight = 0;
     const rowFont = [];
     let actualChar;
     for (const row of this.data) {
@@ -211,7 +232,9 @@ export class SqvLibComponent implements OnChanges {
           actualChar = row[idx].char.length;
         }
       }
-      rowFont.push(1 - (percent * (actualChar - 1)));
+      actualChar = 1 - (percent * (actualChar - 1));
+      rowFont.push(actualChar);
+      chunkHeight += actualChar;
     }
 
     if (chunkSize > 0) {
@@ -219,8 +242,10 @@ export class SqvLibComponent implements OnChanges {
     }
     maxChars = adjust * (maxChars * (1 - percent * (maxChars - 1)));
 
-    this.sqvBody = '';
+    sqvBody[0].innerHTML = '';
+    let oldHeight = 0;
     let chunk;
+    let index;
     let cards = '';
     let cells = '';
     let cell;
@@ -246,19 +271,29 @@ export class SqvLibComponent implements OnChanges {
       cells = '';
 
       if (chunkSize > 0 && i % chunkSize === 0) {
+
+        style = `height: ${chunkHeight}em;`;
+        index = `<div class="absolute">${i + 1 - chunkSize}</div>`;
+        index = `<div class="index hidden" style="${style}">${index}</div>`;
+
         style = `font-size: ${fontSize};`;
         if (i !== maxIdx) {
           style += 'padding-right: ' + spaceSize + 'em;';
         } else {
           style += 'margin-right: ' + spaceSize + 'em;';
         }
-        chunk = `<div class="chunk" style="${style}">${cards}</div>`;
+
+        chunk = `<div class="chunk" style="${style}">${index}${cards}</div>`;
         cards = '';
-        this.sqvBody += chunk;
+        index = '';
 
-        console.log(sqvBody[0].clientHeight);
+        sqvBody[0].innerHTML += chunk;
+
+        if (oldHeight < sqvBody[0].clientHeight) {
+          oldHeight = sqvBody[0].clientHeight;
+          sqvBody[0].lastElementChild.firstElementChild.className = 'index';
+        }
       }
-
       // check body height and show index if needed
     }
   }
