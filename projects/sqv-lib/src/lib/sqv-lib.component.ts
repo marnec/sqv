@@ -1,54 +1,85 @@
-import {Component, Input, OnChanges} from '@angular/core';
+import {AfterViewInit, Component, Input, OnChanges, OnInit} from '@angular/core';
 import { ParametersModel } from './models/parameters.model';
 import {RowsModel} from './models/rows.model';
 import {ColorsModel} from './models/colors.model';
 import {Log} from './models/log.model';
+import {SelectionModel} from './models/selection.model';
 
 @Component ({
   selector: 'mb-sqv-lib',
-  template: '<div class="sqv-body"></div>',
+  template: '<div [ngClass]="classId"></div>',
   styleUrls: ['./sqv-lib.component.css']
 })
 
-export class SqvLibComponent implements OnChanges {
+export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
+
+  static counter = 0;
+  static sqvList = [];
+
   @Input() inp: any;
+  classId: string;
+  init: boolean;
   params: ParametersModel;
   rows: RowsModel;
   colors: ColorsModel;
+  selection: SelectionModel;
   data;
 
   constructor() {
+
+    this.init = false;
     this.params = new ParametersModel();
     this.rows = new RowsModel();
     this.colors = new ColorsModel();
+    this.selection = new SelectionModel();
     this.data = [];
 
     window.onresize = () => {
 
-      const chunks = document.getElementsByClassName('chunk');
-      if (!chunks) {
-        Log.w(1, 'Cannot find chunk elements.');
-        return;
-      }
+      for (const id of SqvLibComponent.sqvList) {
 
-      let oldTop = 0;
-      let newTop;
-      // tslint:disable-next-line:prefer-for-of
-      for (let i = 0; i < chunks.length; i++) {
-        newTop = chunks[i].getBoundingClientRect().top;
-        if (newTop > oldTop) {
-          chunks[i].firstElementChild.className = 'index';
-          oldTop = newTop;
-        } else {
-          chunks[i].firstElementChild.className = 'index hidden';
+        const sqvBody = document.getElementsByClassName(id);
+        if (!sqvBody || sqvBody.length === 0) {
+          Log.w(1, 'Cannot find sqv-body element.');
+          return;
+        }
+
+        const chunks = sqvBody[0].getElementsByClassName('chunk');
+        if (!chunks) {
+          Log.w(1, 'Cannot find chunk elements.');
+          return;
+        }
+
+        let oldTop = 0;
+        let newTop;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < chunks.length; i++) {
+          newTop = chunks[i].getBoundingClientRect().top;
+          if (newTop > oldTop) {
+            chunks[i].firstElementChild.className = 'index';
+            oldTop = newTop;
+          } else {
+            chunks[i].firstElementChild.className = 'index hidden';
+          }
         }
       }
     };
   }
 
+  ngOnInit(): void {
+    this.classId = 'root sqv-body-' + SqvLibComponent.counter;
+    SqvLibComponent.counter += 1;
+  }
+
+  ngAfterViewInit(): void {
+    this.init = true;
+    SqvLibComponent.sqvList.push(this.classId);
+    this.ngOnChanges();
+  }
+
   ngOnChanges() {
 
-    if (this.inp === undefined) {
+    if (!this.init || this.inp === undefined) {
       return;
     }
 
@@ -198,8 +229,8 @@ export class SqvLibComponent implements OnChanges {
 
   private createGUI() {
 
-    const sqvBody = document.getElementsByClassName('sqv-body');
-    if (!sqvBody) {
+    const sqvBody = document.getElementsByClassName(this.classId);
+    if (!sqvBody || sqvBody.length === 0) {
       Log.w(1, 'Cannot find sqv-body element.');
       return;
     }
@@ -238,9 +269,11 @@ export class SqvLibComponent implements OnChanges {
     }
 
     if (chunkSize > 0) {
-      maxIdx += chunkSize - (maxIdx % chunkSize);
+      maxIdx += (chunkSize - (maxIdx % chunkSize)) % chunkSize;
     }
     maxChars = adjust * (maxChars * (1 - percent * (maxChars - 1)));
+
+    console.log(maxIdx);
 
     sqvBody[0].innerHTML = '';
     let oldHeight = 0;
@@ -294,7 +327,6 @@ export class SqvLibComponent implements OnChanges {
           sqvBody[0].lastElementChild.firstElementChild.className = 'index';
         }
       }
-      // check body height and show index if needed
     }
   }
 

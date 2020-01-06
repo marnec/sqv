@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { SqvLibComponent } from './sqv-lib.component';
-import {SafePipe} from './pipes/safe.pipe';
+import {CommonModule} from '@angular/common';
 
 @NgModule({
-  declarations: [SqvLibComponent, SafePipe],
-  imports: [
-  ],
+  declarations: [SqvLibComponent],
+    imports: [
+        CommonModule
+    ],
   exports: [SqvLibComponent]
 })
 

@@ -1,4 +1,4 @@
-:host ::ng-deep .sqv-body{
+:host ::ng-deep .root{
   position:relative;
   width:100%;
   height: auto;
@@ -72,4 +72,9 @@
   -ms-user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+}
+
+:host ::ng-deep .highlight {
+  background-color: #333333 !important;
+  color: #dddddd !important;
 }

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  template: '<mb-sqv-lib [inp]="this.input"></mb-sqv-lib><button (click)="change()">BOTTONAZZO</button>',
+  templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
@@ -18,6 +18,34 @@ export class AppComponent {
         { row: '2', color: '#a1b2c3', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
         ],
+      15: [
+        { row: '2', color: '(22, 33, 4, 0.3)', target: 'background'},
+        { row: '3', color: '@adjacent', target: 'border'},
+      ],
+      BA: [
+        { row: '2', color: '#bb55cc', target: 'foreground'},
+        { row: '3', color: '@adjacent', target: 'border'},
+      ]
+    },
+    parameters: {
+      fontSize: '25px',
+      chunkSize: '5',
+      spaceSize: '1',
+      log: 'debug'
+    }
+  };
+
+  myInput: any = {
+    rows: {
+      1: {data: ['1', '2', '3', '4', '5', '6'], filter: 'skipIndex_2'},
+      2: {data: 'BABcacacacBBAanansjdnaj123123na1jas', filter: 'skipIndex_2'},
+      3: {data: {5: '2', 8: '1', 1: '1'}, filter: 'skipIndex_2'}
+    },
+    colors: {
+      '1-3': [
+        { row: '2', color: '#a1b2c3', target: 'background'},
+        { row: '3', color: '@adjacent', target: 'border'},
+      ],
       15: [
         { row: '2', color: '(22, 33, 4, 0.3)', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
