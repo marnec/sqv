@@ -1,4 +1,5 @@
 import {Log} from './log.model';
+import {RowsModel} from './rows.model';
 
 /** Input Colors */
 interface InpColors {
@@ -37,6 +38,13 @@ interface CharColor {
 export class ColorsModel {
 
   palette: OutColors;
+  amino = ['A', 'I', 'L', 'M', 'V', 'F', 'Y', 'W', 'N', 'C', 'Q', 'S', 'T', 'D', 'E', 'R', 'H', 'K', 'G', 'P'];
+  clustal = { G: 'rgb(219, 95, 29)', P: 'rgb(219, 95, 29)', S: 'rgb(219, 95, 29)', T: 'rgb(219, 95, 29)',
+              H: 'rgb(194, 27, 12)', K: 'rgb(194, 27, 12)', R: 'rgb(194, 27, 12)',
+              F: 'rgb(22, 31, 199)', W: 'rgb(22, 31, 199)', Y: 'rgb(22, 31, 199)',
+              I: 'rgb(4, 112, 33)', L: 'rgb(4, 112, 33)', M: 'rgb(4, 112, 33)', V: 'rgb(4, 112, 33)'
+  };
+
 
   getRowsList(coloring: string) {
     const outCol = this.palette[coloring];
@@ -84,7 +92,6 @@ export class ColorsModel {
 
     this.transformInput(inp, sep);
     this.transformColors();
-    console.log(this.palette);
   }
 
   private transformInput(inp: InpColors, sep: string) {
@@ -131,7 +138,6 @@ export class ColorsModel {
           this.palette[info.type][info.row].positions
             .push({start: regions[0] - 1, end: regions[1] - 1, color: e.color, target: info.target});
         }
-        // if region contains chars: e.g. 'A' || 'ATG' || '1'
       } else {
 
         for (const e of inp[reg]) {
@@ -139,9 +145,16 @@ export class ColorsModel {
           if (info === -1) {
             continue;
           }
-          this.palette[info.type][info.row].chars.push({entity: reg, color: e.color, target: info.target});
+          // reg shortcut for all aminoacids
+          if (reg === `@amino@`) {
+            for (const aa of this.amino) {
+              this.palette[info.type][info.row].chars.push({entity: aa, color: e.color, target: info.target});
+            }
+          } else {
+            // if region contains chars: e.g. 'A' || 'ATG' || '1'
+            this.palette[info.type][info.row].chars.push({entity: reg, color: e.color, target: info.target});
+          }
         }
-
       }
     }
   }
@@ -154,7 +167,7 @@ export class ColorsModel {
     let t;
     for (const type in this.palette) {
       if (type === 'adjacent' || type === 'opposite') {
-
+        console.log(this.palette);
         // tslint:disable-next-line:forin
         for (const row in this.palette[type]) {
           c = this.palette[type][row];
@@ -195,7 +208,26 @@ export class ColorsModel {
             }
           }
         }
+      } else if (type == 'clustal') {
+        for (const row in this.palette[type]) {
+          c = this.palette[type][row];
+          if (c.positions > 0) {
 
+            for (const pos of c.positions) {
+              for (let i = pos.start; i <= pos.end; i++) {
+                c.positions.push({start: i, end: i, color: '@clustal'});
+              }
+            }
+          }
+          for (const e in c.chars) {
+            t = c.chars[e];
+            if (t.entity in this.clustal) {
+              t.color = this.clustal[t.entity];
+            } else {
+              delete c.chars[e];
+            }
+          }
+        }
       } else {
         Log.w(1, 'Unknown coloring type.');
       }
@@ -283,8 +315,7 @@ export class ColorsModel {
     for (let i = 0; i < 3; i++) {
       l1 = c[hex[i * 2]];
       l2 = c[hex[i * 2 + 1]];
-
-      if (!l1 || !l2) {
+      if (l1 === undefined || l2 === undefined) {
         Log.w(1, 'Invalid char in hex value.');
         return -1;
       }

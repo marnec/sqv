@@ -90,6 +90,7 @@ export class RowsModel {
 
       this.rows[row] = {};
       // tslint:disable-next-line:forin
+
       for (const idx in data) {
         this.rows[row][idx] = {char: data[idx]};
       }
@@ -102,7 +103,7 @@ export class RowsModel {
     return Object.keys(this.rows);
   }
 
-  getRow(rowNum: number) {
+  public getRow(rowNum: number) {
     return this.rows[rowNum];
   }
 }

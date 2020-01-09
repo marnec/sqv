@@ -9,23 +9,18 @@ export class AppComponent {
 
   input: any = {
     rows: {
-      1: {data: ['1', '2', '3', '4', '5', '6'], filter: 'skipIndex_2'},
-      2: {data: 'BABABABBABABABBAanansjdnaj123123najeadajandajndj12jn231jas', filter: 'skipIndex_2'},
-      3: {data: {5: '2', 8: '1', 1: '1'}, filter: 'skipIndex_2'}
+      1: {data: 'GGPSTTTKKHRRRRSKPLEEMSNKKRRRSMSNKKRRRSKPLEEMSNKKRRRS', filter: 'skipIndex_2'}
     },
     colors: {
       '1-3': [
-        { row: '2', color: '#a1b2c3', target: 'background'},
-        { row: '3', color: '@adjacent', target: 'border'},
+        { row: '3', color: '@adjacent', target: 'background'},
         ],
-      15: [
-        { row: '2', color: '(22, 33, 4, 0.3)', target: 'background'},
-        { row: '3', color: '@adjacent', target: 'border'},
+      '17-26': [
+        { row: '1', color: '#00ff00', target: 'background'}
       ],
-      BA: [
-        { row: '2', color: '#bb55cc', target: 'foreground'},
-        { row: '3', color: '@adjacent', target: 'border'},
-      ]
+      // '@amino@': [
+      //   { row: '1', color: '@clustal', target: 'background'}
+      // ]
     },
     parameters: {
       fontSize: '25px',
@@ -37,13 +32,17 @@ export class AppComponent {
 
   myInput: any = {
     rows: {
-      1: {data: ['1', '2', '3', '4', '5', '6'], filter: 'skipIndex_2'},
-      2: {data: 'BABcacacacBBAanansjdnaj123123na1jas', filter: 'skipIndex_2'},
-      3: {data: {5: '2', 8: '1', 1: '1'}, filter: 'skipIndex_2'}
+      1: {data: ['1', '2', '@alpha', '4', '5', '6'], filter: 'skipIndex_2'},
+      2: {data: 'MSNKKRRRSKPLEEMSNKKRRRSKPLEEMSNKKRRRSKPLEE', filter: 'skipIndex_2'},
+      3: {data:'MSNKKRRRSKPLEEMSNRRSKPLEEMSNKKRRRSKPLEE', filter: 'skipIndex_2'}
     },
     colors: {
-      '1-3': [
-        { row: '2', color: '#a1b2c3', target: 'background'},
+      '1-15': [
+        { row: '2', color: '@clustal', target: 'background'},
+        { row: '3', color: '@adjacent', target: 'border'},
+      ],
+      '20-25': [
+        { row: '2', color: '@clustal', target: 'background'},
         { row: '3', color: '@adjacent', target: 'border'},
       ],
       15: [

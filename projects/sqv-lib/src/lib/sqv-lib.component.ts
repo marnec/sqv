@@ -104,7 +104,7 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
     this.data = [];
 
     // decide which color is more important in case of overwriting
-    const coloringOrder = ['custom', 'opposite', 'adjacent'];
+    const coloringOrder = ['custom', 'clustal', 'opposite', 'adjacent'];
     const methodOrder = ['positions', 'chars'];
 
     // order row Numbers
@@ -139,51 +139,56 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
           if (method === 'chars') {
             // loop through entity colors
             for (const e of this.colors.getChars(coloring, rowNum)) {
-              if (isNaN(+e.entity)) {
-                // match chars in data
-                tmp1 = this.findMatchingChars(data, tmp, e.entity);
-              } else {
-                // match strings in data
-                tmp1 = this.findMatchingStrings(data, tmp, e.entity);
-              }
-
-              for (const match of tmp1) {
-                for (const idx of match) {
-                  if (data[idx].color) {
-                    log = 'Row: ' + rowNum + ', ';
-                    log += 'Index: ' + idx + ', ';
-                    log += 'Prev color: ' + data[idx].color + ', ';
-                    log += 'New color: ' + e.color + '.';
-                    Log.w(2, log);
+              if (e !== undefined) {
+                if (isNaN(+e.entity)) {
+                  // match chars in data
+                  tmp1 = this.findMatchingChars(data, tmp, e.entity);
+                } else {
+                  // match strings in data
+                  tmp1 = this.findMatchingStrings(data, tmp, e.entity);
+                }
+                for (const match of tmp1) {
+                  for (const idx of match) {
+                    if (data[idx].color) {
+                      log = 'Row: ' + rowNum + ', ';
+                      log += 'Index: ' + idx + ', ';
+                      log += 'Prev color: ' + data[idx].color + ', ';
+                      log += 'New color: ' + e.color + '.';
+                      Log.w(2, log);
+                    }
+                    data[idx].color = e.color;
+                    data[idx].target = e.target;
                   }
-                  data[idx].color = e.color;
-                  data[idx].target = e.target;
                 }
               }
             }
           } else if (method === 'positions') {
-            for (const e of this.colors.getPositions(coloring, rowNum)) {
-              for (let i = e.start; i <= e.end; i++) {
-                if (!data[i]) {
-                  continue;
+            const positions = this.colors.getPositions(coloring, rowNum);
+
+            if (positions.length > 0) {
+              for (const e of positions) {
+                for (let i = e.start; i <= e.end; i++) {
+                  if (!data[i]) {
+                    continue;
+                  }
+                  if (data[i].color) {
+                    log = 'Row: ' + rowNum + ', ';
+                    log += 'Index: ' + i + ', ';
+                    log += 'Prev color: ' + data[i].color + ', ';
+                    log += 'New color: ' + e.color + '.';
+                    Log.w(2, log);
+                  }
+                  data[i].color = e.color;
+                  data[i].target = e.target;
                 }
-                if (data[i].color) {
-                  log = 'Row: ' + rowNum + ', ';
-                  log += 'Index: ' + i + ', ';
-                  log += 'Prev color: ' + data[i].color + ', ';
-                  log += 'New color: ' + e.color + '.';
-                  Log.w(2, log);
-                }
-                data[i].color = e.color;
-                data[i].target = e.target;
               }
             }
           }
         }
       }
+      console.log(this.data);
       this.data.push(data);
     }
-    console.log(this.data);
   }
 
   private findMatchingChars(data, orderedKeys,  match: string) {
