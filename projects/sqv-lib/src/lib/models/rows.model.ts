@@ -95,7 +95,6 @@ export class RowsModel {
         this.rows[row][idx] = {char: data[idx]};
       }
     }
-    console.log(this.rows);
 
   }
 

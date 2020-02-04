@@ -167,7 +167,6 @@ export class ColorsModel {
     let t;
     for (const type in this.palette) {
       if (type === 'adjacent' || type === 'opposite') {
-        console.log(this.palette);
         // tslint:disable-next-line:forin
         for (const row in this.palette[type]) {
           c = this.palette[type][row];

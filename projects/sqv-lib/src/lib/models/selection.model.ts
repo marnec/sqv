@@ -13,7 +13,7 @@ export class SelectionModel {
     this.selected = false;
 
     window.onmousedown = (e) => {
-      console.log('WORKING! ' + e.button);
+      console.log('sqv clicked! ' + e.button);
     };
   }
 

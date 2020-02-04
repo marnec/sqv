@@ -78,6 +78,8 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   ngOnChanges() {
+    console.log(this.init);
+    console.log(this.inp);
 
     if (!this.init || this.inp === undefined) {
       return;
@@ -85,18 +87,24 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
 
     /** check and process parameters input */
     this.params.process(this.inp.parameters);
+    console.log('check and process parameters input');
 
     /** check and process rows input */
     this.rows.process(this.inp.rows);
+    console.log('check and process rows input');
 
     /** check and process colors input */
     this.colors.process(this.inp.colors, this.params.getSeparator());
+    console.log('check and process colors input');
 
     /** apply color to data rows */
     this.processRowsCols();
+    console.log('apply color to data rows');
+
 
     /** create/update sqv-body html */
     this.createGUI();
+    console.log(' create/update sqv-body html');
   }
 
   processRowsCols() {
@@ -233,17 +241,18 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   private createGUI() {
+    console.log('start create GUI');
 
     const sqvBody = document.getElementsByClassName(this.classId);
     if (!sqvBody || sqvBody.length === 0) {
       Log.w(1, 'Cannot find sqv-body element.');
       return;
     }
-
     const chunkSize = this.params.getChunkSize();
     const emptyFiller = this.params.getEmptyFiller();
     const fontSize = this.params.getFontSize();
     const spaceSize = this.params.getSpaceSize();
+
     const percent = 0.15;
     const adjust = 3 / 5;
 
@@ -278,17 +287,19 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
     }
     maxChars = adjust * (maxChars * (1 - percent * (maxChars - 1)));
 
-    console.log(maxIdx);
+    console.log('start building divs');
 
     sqvBody[0].innerHTML = '';
     let oldHeight = 0;
     let chunk;
-    let index;
+    let index = '';
     let cards = '';
     let cells = '';
     let cell;
     let entity;
     let style;
+    let html = '';
+
     for (let i = 1; i <= maxIdx; i++) {
       for (let j = 0; j < this.data.length; j++) {
         entity = this.data[j][i];
@@ -302,6 +313,7 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
           cell = `<div class="cell" style="${style}">${entity.char}</div>`;
         }
         cells += cell;
+
       }
 
       style = `width: ${maxChars}em;`;
@@ -322,17 +334,20 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
         }
 
         chunk = `<div class="chunk" style="${style}">${index}${cards}</div>`;
+        // chunk = `<div class="chunk" style="${style}">${cards}</div>`;
         cards = '';
         index = '';
 
-        sqvBody[0].innerHTML += chunk;
-
-        if (oldHeight < sqvBody[0].clientHeight) {
-          oldHeight = sqvBody[0].clientHeight;
-          sqvBody[0].lastElementChild.firstElementChild.className = 'index';
-        }
+        html += chunk;
+        // if (oldHeight < sqvBody[0].clientHeight) {
+        //   oldHeight = sqvBody[0].clientHeight;
+        //   sqvBody[0].lastElementChild.firstElementChild.className = 'index';
+        // }
       }
     }
+
+    sqvBody[0].innerHTML = html;
+    window.dispatchEvent(new Event('resize'));
   }
 
 }
