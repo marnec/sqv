@@ -9,14 +9,14 @@ export class AppComponent {
 
   input: any = {
     rows: {
-      1: {data: 'GGPSTTTKKHRRRRSKPLEEMSNKKRRRSMSNKKRRRSKPLEEMSNKKRRRS', filter: 'skipIndex_2'}
+      1: {data: 'GGPSTTTKKHRRRRSKPLEEMSNKKRRRSMSNKKRRRSKPLEEMSNKKRRRS'}
     },
     colors: {
       'A': [
-        { row: '1', color: '#ffff00', target: 'background'},
+        { row: '1', color: '#03256C', target: 'background'},
         ],
-      '10-15': [
-        { row: '1', color: '#00ff00', target: 'background'}
+      '11-15': [
+        { row: '1', color: '#03256C', target: 'background'}
       ],
       // '@amino@': [
       //   { row: '1', color: '@clustal', target: 'background'}

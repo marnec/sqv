@@ -136,7 +136,7 @@ export class ColorsModel {
           }
 
           this.palette[info.type][info.row].positions
-            .push({start: regions[0] - 1, end: regions[1] - 1, color: e.color, target: info.target});
+            .push({start: regions[0], end: regions[1], color: e.color, target: info.target});
         }
       } else {
 

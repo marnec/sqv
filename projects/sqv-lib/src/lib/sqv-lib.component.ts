@@ -35,19 +35,18 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
     this.data = [];
 
     window.onresize = () => {
-
       for (const id of SqvLibComponent.sqvList) {
 
         const sqvBody = document.getElementsByClassName(id);
         if (!sqvBody || sqvBody.length === 0) {
           Log.w(1, 'Cannot find sqv-body element.');
-          return;
+          continue;
         }
 
         const chunks = sqvBody[0].getElementsByClassName('chunk');
         if (!chunks) {
           Log.w(1, 'Cannot find chunk elements.');
-          return;
+          continue;
         }
 
         let oldTop = 0;
@@ -68,18 +67,16 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.classId = 'root sqv-body-' + SqvLibComponent.counter;
+    SqvLibComponent.sqvList.push(this.classId);
     SqvLibComponent.counter += 1;
   }
 
   ngAfterViewInit(): void {
     this.init = true;
-    SqvLibComponent.sqvList.push(this.classId);
     this.ngOnChanges();
   }
 
   ngOnChanges() {
-    console.log(this.init);
-    console.log(this.inp);
 
     if (!this.init || this.inp === undefined) {
       return;
@@ -87,24 +84,19 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
 
     /** check and process parameters input */
     this.params.process(this.inp.parameters);
-    console.log('check and process parameters input');
 
     /** check and process rows input */
     this.rows.process(this.inp.rows);
-    console.log('check and process rows input');
 
     /** check and process colors input */
     this.colors.process(this.inp.colors, this.params.getSeparator());
-    console.log('check and process colors input');
 
     /** apply color to data rows */
     this.processRowsCols();
-    console.log('apply color to data rows');
 
 
     /** create/update sqv-body html */
     this.createGUI();
-    console.log(' create/update sqv-body html');
   }
 
   processRowsCols() {
@@ -194,7 +186,6 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
           }
         }
       }
-      console.log(this.data);
       this.data.push(data);
     }
   }
@@ -241,7 +232,6 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   private createGUI() {
-    console.log('start create GUI');
 
     const sqvBody = document.getElementsByClassName(this.classId);
     if (!sqvBody || sqvBody.length === 0) {
@@ -287,8 +277,6 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
     }
     maxChars = adjust * (maxChars * (1 - percent * (maxChars - 1)));
 
-    console.log('start building divs');
-
     sqvBody[0].innerHTML = '';
     let oldHeight = 0;
     let chunk;
@@ -304,6 +292,11 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
       for (let j = 0; j < this.data.length; j++) {
         entity = this.data[j][i];
         style = 'font-size: ' + rowFont[j] + 'em;';
+        if (j == this.data.length - 1) {
+          console.log(j);
+          style = 'font-size: ' + rowFont[j] + 'em; margin-bottom: 20px;';
+
+        }
         if (!entity) {
           cell = `<div class="cell" style="${style}">${emptyFiller}</div>`;
         } else {
@@ -312,6 +305,7 @@ export class SqvLibComponent implements OnChanges, OnInit, AfterViewInit {
           }
           cell = `<div class="cell" style="${style}">${entity.char}</div>`;
         }
+        console.log(cell);
         cells += cell;
 
       }

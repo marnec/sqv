@@ -1,6 +1,6 @@
 {
   "name": "sqv-lib",
-  "version": "0.2.78",
+  "version": "0.2.84",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14"
