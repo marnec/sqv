@@ -1,6 +1,7 @@
-Download: npm i sqv-lib 
+## Download: 
+npm i sqv-lib 
 
-Integration example:
+## Integration example:
 
 -app.module.ts:
 import {SqvLibModule} from 'sqv-lib';
